@@ -5,6 +5,9 @@
 > crawl, a NOT-NAND grammar, and The Known Universe riding the scope.
 > scatter-city, the second face of the observable, wired over every surface.
 > Show me the mechanism.
+>
+> It lives in the same wavelength it creates: the line which mates —
+> written against property law — written by the fleet. 8b-is · 2026-09-18
 
 Live at [oscilloscope.vaked.dev](https://oscilloscope.vaked.dev/) · source
 under 8b-is · renames the working title "crossmap" into the constellation

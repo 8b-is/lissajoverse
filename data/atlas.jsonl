@@ -42,3 +42,4 @@
 {"id": "lissajoverse", "title": "lissajoverse", "url": "https://oscilloscope.vaked.dev/", "cat": "fleet", "hop": 0, "source": "static"}
 {"id": "leekhotline-·-embrace-ai", "title": "leekHotline · embrace ai", "url": "https://github.com/leekHotline", "cat": "fleet", "hop": 0, "source": "static"}
 {"id": "main-page", "title": "Main Page", "url": "https://en.wikipedia.org/wiki/Main_Page", "cat": "cosmos", "hop": 1, "source": "wiki"}
+{"id": "margaret-hamilton", "title": "Margaret Hamilton · the AGC", "url": "https://en.wikipedia.org/wiki/Margaret_Hamilton_(software_engineer)", "cat": "cosmos", "hop": 0, "source": "static"}
