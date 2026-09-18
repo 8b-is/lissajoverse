@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>lissajoverse — OSC-9000 ▸ the observable universe as a lissajous graph</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="index,follow" />
+<meta name="description" content="A retro oscilloscope reborn: lissajous curves, the observable universe, a NOT-NAND grammar, Nate's papers, and The Known Universe. show me the mechanism." />
+<link rel="canonical" href="https://oscilloscope.vaked.dev/" />
+<style>
+  :root {
+    --phos: #39ff14;
+    --phos-dim: rgba(57,255,20,0.55);
+    --gold: #ffb86b;
+    --violet: #b48bff;
+    --cyan: #00f0ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #050805;
+    color: var(--phos);
+    font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 14px;
+  }
+  .chassis {
+    width: min(1000px, 100%);
+    background: linear-gradient(180deg, #0d120d, #0a0e0a);
+    border: 1px solid #1c2a1c;
+    border-radius: 14px;
+    box-shadow: 0 0 40px rgba(57,255,20,0.06), inset 0 0 60px rgba(0,0,0,0.8);
+    padding: 14px 16px 18px;
+  }
+  .title-bar {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: #7da87d; padding-bottom: 8px; border-bottom: 1px solid #182418;
+  }
+  .title-bar .brand { color: var(--phos); font-weight: 700; }
+  .title-bar .model { color: #5f8a5f; }
+  .status-led { width: 10px; height: 10px; border-radius: 50%; background: #1c2a1c; }
+  .status-led.on { background: var(--phos); box-shadow: 0 0 10px var(--phos); }
+  .screen-bezel {
+    position: relative; margin: 12px 0 6px; padding: 10px;
+    background: #020402; border: 2px solid #162016; border-radius: 8px;
+  }
+  #scope-canvas { display: block; width: 100%; height: 420px; background: #000; border-radius: 4px; }
+  .scanlines {
+    position: absolute; inset: 0; pointer-events: none; border-radius: 6px;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px);
+    mix-blend-mode: multiply;
+  }
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none; border-radius: 6px;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  }
+  .grid-labels {
+    display: flex; justify-content: space-between; font-size: 10px;
+    color: #5f8a5f; letter-spacing: 1px; margin: 0 4px 10px;
+  }
+  .caption {
+    min-height: 30px; padding: 6px 10px; margin: 6px 0 10px;
+    background: rgba(57,255,20,0.04); border: 1px dashed #1c2a1c; border-radius: 6px;
+    font-size: 11.5px; line-height: 1.5; color: #a8ff78; letter-spacing: 0.3px;
+  }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 14px; }
+  .ctrl-group label { display: block; font-size: 10px; color: #5f8a5f; letter-spacing: 1px; margin-bottom: 4px; }
+  .ctrl-group input[type="range"] { width: 100%; accent-color: var(--phos); }
+  .ctrl-value { text-align: right; font-size: 10px; color: #7da87d; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .retro-btn {
+    flex: 1 1 auto; padding: 8px 10px; font-size: 11px; letter-spacing: 1px;
+    font-family: inherit; color: var(--phos); background: #0a120a;
+    border: 1px solid #1c2a1c; border-radius: 5px; cursor: pointer;
+  }
+  .retro-btn:hover { border-color: var(--phos-dim); }
+  .retro-btn.active { background: rgba(57,255,20,0.12); border-color: var(--phos); box-shadow: 0 0 8px rgba(57,255,20,0.3); }
+  .rec-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .rec-status { font-size: 10px; color: #7da87d; }
+  .rec-status.live { color: var(--phos); }
+  .rec-status.err { color: var(--gold); }
+  .readout-row {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px;
+    padding-top: 10px; border-top: 1px solid #182418;
+    font-size: 11px; color: #7da87d; letter-spacing: 1px;
+  }
+  .readout-row b { color: var(--phos); font-weight: 600; }
+  #vid-layer {
+    position: fixed; inset: 0; z-index: 50; display: flex;
+    align-items: center; justify-content: center; background: rgba(0,0,0,0.92);
+  }
+  #vid-layer.hidden { display: none; }
+  #vid-frame {
+    width: min(960px, 92vw); aspect-ratio: 16/9; border: 1px solid #1c2a1c; border-radius: 8px;
+  }
+  #vid-close {
+    position: absolute; top: 18px; right: 22px; font-size: 13px; letter-spacing: 2px;
+    color: var(--phos); background: none; border: 1px solid #1c2a1c; padding: 6px 12px;
+    border-radius: 5px; cursor: pointer; font-family: inherit;
+  }
+  #vid-close:hover { border-color: var(--phos); }
+  .atlas-note { font-size: 10px; color: #4f7a4f; margin-top: 8px; text-align: right; letter-spacing: 0.5px; }
+  a { color: var(--violet); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="chassis">
+  <div class="title-bar">
+    <div>
+      <div class="brand">LISSAJOVERSE INSTRUMENTS</div>
+      <div class="model">OSC-9000 ▸ OBSERVABLE UNIVERSE AS A LISSAJOUS GRAPH</div>
+    </div>
+    <div class="status-led" id="led" title="Status"></div>
+  </div>
+
+  <div class="screen-bezel">
+    <canvas id="scope-canvas"></canvas>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <div class="grid-labels">
+    <span>CH1</span>
+    <span id="freq-label">--- Hz</span>
+    <span id="time-label">10 ms/div</span>
+  </div>
+
+  <div class="caption" id="caption">
+    show me the mechanism. lissajous curves, the observable universe, a NOT-NAND grammar
+    (Nate's papers ride the graph, The Known Universe rides the scope).
+  </div>
+
+  <div class="controls">
+    <div class="ctrl-group">
+      <label for="gain">Gain (V/div)</label>
+      <input type="range" id="gain" min="1" max="200" value="60" aria-label="Gain"/>
+      <div class="ctrl-value" id="gain-val">60</div>
+    </div>
+    <div class="ctrl-group">
+      <label for="timebase">Time Base</label>
+      <input type="range" id="timebase" min="1" max="20" value="8" aria-label="Time Base"/>
+      <div class="ctrl-value" id="timebase-val">8 ms/div</div>
+    </div>
+    <div class="ctrl-group">
+      <label for="trigger">Trigger Level</label>
+      <input type="range" id="trigger" min="-100" max="100" value="0" aria-label="Trigger Level"/>
+      <div class="ctrl-value" id="trigger-val">0</div>
+    </div>
+    <div class="ctrl-group">
+      <label for="decay">Phosphor Decay</label>
+      <input type="range" id="decay" min="1" max="30" value="12" aria-label="Phosphor Decay"/>
+      <div class="ctrl-value" id="decay-val">12</div>
+    </div>
+    <div class="ctrl-group">
+      <label for="ratio">Lissajous Ratio (fx:fy)</label>
+      <select id="ratio" aria-label="Lissajous ratio">
+        <option value="1,1">1 : 1</option>
+        <option value="2,3" selected>2 : 3</option>
+        <option value="3,4">3 : 4</option>
+        <option value="5,8">5 : 8</option>
+        <option value="3,2">3 : 2</option>
+        <option value="8,13">8 : 13</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label for="weave">Weave (traces)</label>
+      <input type="range" id="weave" min="1" max="7" value="3" aria-label="Weave count"/>
+      <div class="ctrl-value" id="weave-val">3</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="retro-btn active" id="btn-mic" title="Microphone input">🎙 Mic</button>
+    <button class="retro-btn" id="btn-output" title="System output">🔊 Output</button>
+    <button class="retro-btn" id="btn-sine">〜 Sine</button>
+    <button class="retro-btn" id="btn-sawtooth">⊿ Saw</button>
+    <button class="retro-btn" id="btn-noise">⋯ Noise</button>
+    <button class="retro-btn" id="btn-lissajous">◎ Lissajous</button>
+    <button class="retro-btn" id="btn-universe">☉ Universe</button>
+    <button class="retro-btn" id="btn-nand">⊼ NAND</button>
+    <button class="retro-btn" id="btn-video">▶ Known Universe</button>
+  </div>
+
+  <div class="rec-row">
+    <button class="retro-btn" id="btn-record">◉ REC → HF (off)</button>
+    <div class="rec-status" id="rec-status">not recording · nothing uploaded</div>
+  </div>
+
+  <div class="readout-row">
+    <div>FREQ <b id="r-freq">---</b> Hz</div>
+    <div>AMP <b id="r-amp">---</b></div>
+    <div>MODE <b id="r-mode">MICROPHONE</b></div>
+    <div>SR <b id="r-sr">---</b> Hz</div>
+    <div>ATLAS <b id="r-atlas">…</b></div>
+    <div>CENTRALITY <b id="r-cent">…</b></div>
+  </div>
+
+  <div class="atlas-note">
+    data: the vault (Nate's papers) · a robots.txt-respecting wikipedia crawl ·
+    the AMNH <a href="https://www.amnh.org/research/hayden-planetarium" target="_blank" rel="noopener">Hayden Planetarium</a>
+    Digital Universe Atlas lineage · Uniview-by-SCISS as the sibling instrument ·
+    every mechanism in this page is inspectable: <a href="https://github.com/8b-is/lissajoverse" target="_blank" rel="noopener">show me the code</a>
+  </div>
+</div>
+
+<div id="vid-layer" class="hidden">
+  <button id="vid-close" aria-label="close video">✕ CLOSE</button>
+  <iframe id="vid-frame" title="The Known Universe × Time (We Plants Are Happy Plants Remix)"
+    src="https://www.youtube-nocookie.com/embed/DVPcDNwcgbI?rel=0&modestbranding=1"
+    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen></iframe>
+</div>
+
+<script id="lv-core">
+/* ═══════════════════════════════════════════════════════════════
+   lv-core — the pure engine. no DOM, no side effects.
+   mirrors 8b-is-engine's UltraGraph (Freeman degree + closeness),
+   the 1.58-bit ternary lane (the {-1,0,+1} grammar), and lissajous
+   synthesis. every function here is asserted by selftest.mjs.
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  // deterministic rng (mulberry32) — the observable is seeded, never random
+  function rng(seed) {
+    let t = seed >>> 0;
+    return function () {
+      t += 0x6D2B79F5;
+      let r = Math.imul(t ^ (t >>> 15), 1 | t);
+      r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+      return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // lissajous synthesis, normalized -1..1
+  function liss(fx, fy, t, phase) {
+    return { x: Math.sin(fx * t + (phase || 0)), y: Math.sin(fy * t) };
+  }
+  function lissPath(fx, fy, phase, n) {
+    const pts = [];
+    const K = Math.PI * 2;
+    for (let i = 0; i <= n; i++) pts.push(liss(fx, fy, (i / n) * K, phase));
+    return pts;
+  }
+
+  // NOT-NAND grammar on the ternary lane: inputs {-1,0,+1}, output {-1,+1}
+  // a NAND gate is universal; so is a weave of them. everything is NAND.
+  function bin(a) { return a > 0 ? 1 : 0; }                    // 0 and -1 read FALSE
+  function nand(a, b) { return bin(a) === 1 && bin(b) === 1 ? -1 : 1; }
+  function nandPattern(k) {
+    const out = [];
+    let a = 1, b = -1;
+    for (let i = 0; i < k; i++) {
+      const v = nand(a, b);
+      out.push(v);
+      a = nand(a, v);
+      b = nand(b, v);
+    }
+    return out;
+  }
+
+  // UltraGraph parity: Freeman degree centrality, tri-state edges
+  // (+1 friendly / 0 silent / -1 foe) — friends and foes count, silences do not
+  function degreeCentrality(n, edges) {
+    const deg = new Array(n).fill(0);
+    for (const e of edges) {
+      if (e[2] !== 0) {
+        deg[e[0]] += e[2] > 0 ? 1 : -1;
+        deg[e[1]] += e[2] > 0 ? 1 : -1;
+      }
+    }
+    return deg;
+  }
+
+  // UltraGraph parity: closeness via unweighted BFS, normalized by n-1
+  function closeness(n, edges) {
+    const adj = Array.from({ length: n }, function () { return []; });
+    for (const e of edges) {
+      if (e[2] !== 0) { adj[e[0]].push(e[1]); adj[e[1]].push(e[0]); }
+    }
+    const out = new Array(n).fill(0);
+    for (let s = 0; s < n; s++) {
+      const dist = new Array(n).fill(-1);
+      dist[s] = 0;
+      const q = [s];
+      for (let qi = 0; qi < q.length; qi++) {
+        const u = q[qi];
+        for (const v of adj[u]) if (dist[v] < 0) { dist[v] = dist[u] + 1; q.push(v); }
+      }
+      let sum = 0;
+      for (let i = 0; i < n; i++) if (i !== s && dist[i] > 0) sum += 1 / dist[i];
+      out[s] = sum / (n - 1);
+    }
+    return out;
+  }
+
+  // atlas: rows {id,title,url,cat,hop} -> nodes + lissajous edges
+  // cats: 0 vault (the named fires) · 1 fleet · 2 cosmos · 3 logic
+  const CATS = { vault: 0, fleet: 1, cosmos: 2, logic: 3 };
+  function buildAtlas(rows) {
+    const ids = new Map();
+    const nodes = [];
+    for (const r of rows) {
+      if (ids.has(r.id)) continue;
+      ids.set(r.id, nodes.length);
+      nodes.push({
+        id: r.id,
+        title: r.title,
+        url: r.url || '',
+        cat: CATS[r.cat] != null ? CATS[r.cat] : 2,
+        hop: r.hop || 0
+      });
+    }
+    const edges = [];
+    const seen = new Set();
+    const add = function (a, b, w) {
+      const u = ids.get(a), v = ids.get(b);
+      if (u == null || v == null || u === v) return;
+      const key = u < v ? u + '|' + v : v + '|' + u;
+      if (seen.has(key)) return;
+      seen.add(key);
+      edges.push([u, v, w]);
+    };
+    // the vault core: the named fires sit at one table
+    const vaultIds = nodes.filter(function (nd) { return nd.cat === 0; }).map(function (nd) { return nd.id; });
+    for (let i = 0; i < vaultIds.length; i++)
+      for (let j = i + 1; j < vaultIds.length; j++) add(vaultIds[i], vaultIds[j], 1);
+    // logic touches cosmos: the grammar reaches the field
+    for (const nd of nodes) {
+      if (nd.cat !== 3) continue;
+      for (const c of nodes) if (c.cat === 2) add(nd.id, c.id, 1);
+    }
+    // nothing is an island: every node reaches the vault core
+    const hub = vaultIds[0] != null ? vaultIds[0] : (nodes[0] && nodes[0].id);
+    if (hub != null) for (const nd of nodes) if (nd.id !== hub) add(nd.id, hub, 1);
+    return { nodes: nodes, edges: edges };
+  }
+
+  // the observable: a deterministic starfield layer (seeded, reproducible)
+  function universeLayer(seed, count) {
+    const r = rng(seed);
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const a = r() * Math.PI * 2;
+      const b = Math.acos(2 * r() - 1);
+      out.push({
+        x: Math.sin(b) * Math.cos(a),
+        y: Math.sin(b) * Math.sin(a),
+        z: Math.cos(b),
+        m: 0.4 + r() * 0.6
+      });
+    }
+    return out;
+  }
+
+  // The Known Universe × Time (We Plants Are Happy Plants Remix)
+  const VIDEO_URL = 'https://www.youtube-nocookie.com/embed/DVPcDNwcgbI?rel=0&modestbranding=1';
+
+  globalThis.__lv = {
+    rng: rng, liss: liss, lissPath: lissPath, bin: bin, nand: nand,
+    nandPattern: nandPattern, degreeCentrality: degreeCentrality,
+    closeness: closeness, buildAtlas: buildAtlas, CATS: CATS,
+    universeLayer: universeLayer, VIDEO_URL: VIDEO_URL
+  };
+})();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   the instrument — retro scope engine (faithful to the OSC-9000)
+   + the lissajoverse surfaces: LISSAJOUS weave · UNIVERSE graph ·
+   NAND grammar · the Known Universe video · REC → HF
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const lv = globalThis.__lv;
+
+  // ── DOM ──────────────────────────────────────────────────────
+  const canvas = document.getElementById('scope-canvas');
+  const ctx = canvas.getContext('2d');
+  const led = document.getElementById('led');
+  const freqLabel = document.getElementById('freq-label');
+  const timeLabel = document.getElementById('time-label');
+  const caption = document.getElementById('caption');
+
+  const gainSlider = document.getElementById('gain');
+  const timebaseSlider = document.getElementById('timebase');
+  const triggerSlider = document.getElementById('trigger');
+  const decaySlider = document.getElementById('decay');
+  const weaveSlider = document.getElementById('weave');
+  const ratioSelect = document.getElementById('ratio');
+
+  const gainVal = document.getElementById('gain-val');
+  const timebaseVal = document.getElementById('timebase-val');
+  const triggerVal = document.getElementById('trigger-val');
+  const decayVal = document.getElementById('decay-val');
+  const weaveVal = document.getElementById('weave-val');
+
+  const rFreq = document.getElementById('r-freq');
+  const rAmp = document.getElementById('r-amp');
+  const rMode = document.getElementById('r-mode');
+  const rSr = document.getElementById('r-sr');
+  const rAtlas = document.getElementById('r-atlas');
+  const rCent = document.getElementById('r-cent');
+
+  const btns = {
+    mic: document.getElementById('btn-mic'),
+    output: document.getElementById('btn-output'),
+    sine: document.getElementById('btn-sine'),
+    sawtooth: document.getElementById('btn-sawtooth'),
+    noise: document.getElementById('btn-noise'),
+    lissajous: document.getElementById('btn-lissajous'),
+    universe: document.getElementById('btn-universe'),
+    nand: document.getElementById('btn-nand'),
+    video: document.getElementById('btn-video')
+  };
+  const vidLayer = document.getElementById('vid-layer');
+  const vidClose = document.getElementById('vid-close');
+
+  const CAPTIONS = {
+    mic: 'the microphone is a witness: every sound is a mechanism requesting inspection.',
+    output: 'the system listens to itself: output as the observable.',
+    sine: 'one tone: the sine is the simplest witness.',
+    sawtooth: 'the saw: a slope that never asks permission.',
+    noise: 'noise: the unseeded background the universe refuses to script.',
+    lissajous: 'ratio in motion: fx:fy weaves a closed curve when the ratio is rational. the observable is ratio, not noise.',
+    universe: 'the atlas breathes: vault papers, the diatribe shelf, the wiki crawl, the fleet — nodes on a seeded starfield, edges as lissajous chords.',
+    nand: 'NOT-NAND: a NAND gate is universal, so is a weave of them. everything is NAND, the graph is its truth table.',
+    video: 'The Known Universe × Time (We Plants Are Happy Plants Remix): from the Himalayas to the afterglow of the Big Bang — the AMNH Digital Universe Atlas, the observable held still.'
+  };
+
+  // ── state ────────────────────────────────────────────────────
+  let audioCtx = null, analyser = null, source = null, micStream = null;
+  let timeBuffer = null;
+  let mode = 'mic';
+  let demoPhase = 0, demoFreq = 220, demoFreq2 = 330;
+  let atlas = null;
+
+  // ── canvas sizing ────────────────────────────────────────────
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+  }
+  function cssW() { return canvas.width / (window.devicePixelRatio || 1); }
+  function cssH() { return canvas.height / (window.devicePixelRatio || 1); }
+
+  // ── grid (faithful OSC-9000) ─────────────────────────────────
+  const DIVS_X = 10, DIVS_Y = 8;
+  function drawGrid() {
+    const W = cssW(), H = cssH();
+    const dx = W / DIVS_X, dy = H / DIVS_Y;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(57,255,20,0.10)';
+    ctx.lineWidth = 0.8;
+    for (let i = 0; i <= DIVS_X; i++) {
+      ctx.beginPath(); ctx.moveTo(i * dx, 0); ctx.lineTo(i * dx, H); ctx.stroke();
+    }
+    for (let j = 0; j <= DIVS_Y; j++) {
+      ctx.beginPath(); ctx.moveTo(0, j * dy); ctx.lineTo(W, j * dy); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function findTrigger(data, level, start, end) {
+    for (let i = start; i < end - 1; i++)
+      if (data[i] < level && data[i + 1] >= level) return i;
+    return start;
+  }
+
+  function estimateFrequency(data, sampleRate) {
+    let crossings = 0, lastSign = data[0] >= 128 ? 1 : -1;
+    for (let i = 1; i < data.length; i++) {
+      const sign = data[i] >= 128 ? 1 : -1;
+      if (sign !== lastSign) { crossings++; lastSign = sign; }
+    }
+    if (crossings < 2 || !sampleRate) return null;
+    return (crossings / 2) / (data.length / sampleRate);
+  }
+
+  function findPeak(data) {
+    let peak = 128;
+    for (let i = 0; i < data.length; i++) if (data[i] > peak) peak = data[i];
+    return peak;
+  }
+
+  function generateDemoBuffer(type) {
+    const len = 2048, rate = 44100, f = demoFreq;
+    const buf = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      const t = i / rate;
+      let v;
+      if (type === 'sawtooth') v = ((f * t + demoPhase / (Math.PI * 2)) % 1) * 2 - 1;
+      else if (type === 'noise') v = Math.random() * 2 - 1;
+      else v = Math.sin(2 * Math.PI * f * t + demoPhase);
+      buf[i] = Math.round(v * 127 + 128);
+    }
+    demoPhase += 0.08;
+    return buf;
+  }
+
+  // ── trace (faithful OSC-9000) ─────────────────────────────────
+  function tracePath(data, startOffset, samples, W, midY, scaleY) {
+    if (samples <= 0) return;
+    ctx.beginPath();
+    const divisor = Math.max(samples - 1, 1);
+    for (let i = 0; i < samples; i++) {
+      const x = (i / divisor) * W;
+      const y = midY - ((data[startOffset + i] - 128) / 128) * scaleY;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  }
+
+  function drawTrace(data) {
+    const W = cssW(), H = cssH();
+    const gain = parseFloat(gainSlider.value);
+    const decay = parseFloat(decaySlider.value) / 100;
+    const midY = H / 2, scaleY = (H / 2) * (gain / 100);
+    const trig = 128 + Math.round(parseFloat(triggerSlider.value));
+    const startOffset = findTrigger(data, trig, 10, Math.floor(data.length / 2));
+    const tb = parseFloat(timebaseSlider.value);
+    const sampleRate = audioCtx ? audioCtx.sampleRate : 44100;
+    const samples = Math.min(Math.floor((tb * DIVS_X / 1000) * sampleRate), data.length - startOffset);
+
+    ctx.fillStyle = 'rgba(0,0,0,' + decay + ')';
+    ctx.fillRect(0, 0, W, H);
+    drawGrid();
+
+    const trigY = midY - ((parseFloat(triggerSlider.value) / 128) * scaleY);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,200,0,0.25)';
+    ctx.lineWidth = 0.7;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath(); ctx.moveTo(0, trigY); ctx.lineTo(W, trigY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    const grad = ctx.createLinearGradient(0, midY - scaleY, 0, midY + scaleY);
+    grad.addColorStop(0, '#39ff14');
+    grad.addColorStop(0.5, '#a8ff78');
+    grad.addColorStop(1, '#39ff14');
+
+    ctx.save();
+    ctx.shadowColor = '#39ff14';
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = 'rgba(57,255,20,0.18)';
+    ctx.lineWidth = 3.5;
+    tracePath(data, startOffset, samples, W, midY, scaleY);
+    ctx.stroke();
+    ctx.shadowBlur = 4;
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    tracePath(data, startOffset, samples, W, midY, scaleY);
+    ctx.stroke();
+    ctx.restore();
+
+    const freq = estimateFrequency(data, sampleRate);
+    if (freq) {
+      rFreq.textContent = freq.toFixed(1);
+      freqLabel.textContent = freq.toFixed(1) + ' Hz';
+    } else {
+      rFreq.textContent = '---';
+      freqLabel.textContent = '--- Hz';
+    }
+    rAmp.textContent = ((findPeak(data) - 128) / 128).toFixed(3);
+    rSr.textContent = sampleRate.toLocaleString();
+    timeLabel.textContent = tb + ' ms/div';
+  }
+
+  // ── lissajous weave ───────────────────────────────────────────
+  function currentRatio() {
+    const parts = ratioSelect.value.split(',').map(Number);
+    return { fx: parts[0] || 3, fy: parts[1] || 2 };
+  }
+
+  function drawLissajous() {
+    const W = cssW(), H = cssH();
+    const gain = parseFloat(gainSlider.value) / 80;
+    const decay = parseFloat(decaySlider.value) / 100;
+    const weave = parseInt(weaveSlider.value, 10) || 1;
+    const { fx, fy } = currentRatio();
+    const cx = W / 2, cy = H / 2;
+    const r = Math.min(W, H) * 0.40 * gain;
+
+    ctx.fillStyle = 'rgba(0,0,0,' + decay + ')';
+    ctx.fillRect(0, 0, W, H);
+    drawGrid();
+
+    ctx.save();
+    for (let w = 0; w < weave; w++) {
+      const det = lv.rng(w * 97 + 3);        // per-trace seeded phase: reproducible weave
+      const phase = demoPhase * (0.6 + 0.4 * w) + det() * Math.PI;
+      const pts = lv.lissPath(fx, fy, phase, 1024);
+      ctx.strokeStyle = w === 0 ? '#39ff14' : 'rgba(57,255,20,' + (0.55 - 0.12 * w) + ')';
+      ctx.lineWidth = w === 0 ? 1.4 : 1.0;
+      ctx.shadowBlur = w === 0 ? 8 : 2;
+      ctx.beginPath();
+      for (let i = 0; i < pts.length; i++) {
+        const x = cx + r * pts[i].x * (w % 2 === 0 ? 1 : 0.82);
+        const y = cy + r * pts[i].y * (w % 2 === 1 ? 1 : 0.82);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    demoPhase += 0.018;
+    rMode.textContent = 'LISSAJOUS ' + fx + ':' + fy;
+    rFreq.textContent = fx + '/' + fy;
+    rAmp.textContent = weave + ' traces';
+    freqLabel.textContent = fx + ' : ' + fy + ' ratio';
+  }
+
+  // ── atlas graph ───────────────────────────────────────────────
+  const CAT_COLORS = ['#ffb86b', '#00f0ff', '#b48bff', '#39ff14'];
+  const CAT_NAMES = ['vault', 'fleet', 'cosmos', 'logic'];
+
+  function nodeLayout(atlas_, rngSeed) {
+    const r = lv.rng(rngSeed);
+    const pos = new Array(atlas_.nodes.length);
+    const N = atlas_.nodes.length;
+    for (let i = 0; i < N; i++) {
+      // radial band per category: vault innermost, logic next, fleet, cosmos outside
+      const cat = atlas_.nodes[i].cat;
+      const band = [0.30, 0.55, 0.86, 0.42][cat];
+      const a = r() * Math.PI * 2;
+      pos[i] = { x: Math.cos(a) * band, y: Math.sin(a) * band };
+    }
+    return pos;
+  }
+
+  function drawGraph() {
+    const W = cssW(), H = cssH();
+    const decay = parseFloat(decaySlider.value) / 100;
+    const t = performance.now() / 1000;
+    const zoom = 1.0 + 0.035 * Math.sin(t * 0.017);      // the observable breathes
+
+    ctx.fillStyle = 'rgba(0,0,0,' + decay + ')';
+    ctx.fillRect(0, 0, W, H);
+
+    // the starfield (seeded)
+    const stars = lv.universeLayer(11, 260);
+    for (const s of stars) {
+      const sx = W / 2 + s.x * W * 0.5 * zoom;
+      const sy = H / 2 + s.y * H * 0.5 * zoom;
+      ctx.fillStyle = 'rgba(200,240,220,' + (0.12 + 0.3 * s.m) + ')';
+      ctx.fillRect(sx, sy, 1, 1);
+    }
+    drawGrid();
+
+    if (!atlas) return;
+    const r = Math.min(W, H) * 0.42 * zoom;
+    const cx = W / 2, cy = H / 2;
+    const pos = nodeLayout(atlas, 42);
+    const deg = lv.degreeCentrality(atlas.nodes.length, atlas.edges);
+    const clos = lv.closeness(atlas.nodes.length, atlas.edges);
+
+    // edges as lissajous chords (nodal lines that breathe)
+    ctx.save();
+    for (const e of atlas.edges) {
+      const a = pos[e[0]], b = pos[e[1]];
+      const phase = t * 0.6 + (e[0] * 0.13 + e[1] * 0.07);
+      const mx = Math.sin(phase), my = Math.cos(phase * 1.1);
+      ctx.strokeStyle = e[2] === 0 ? 'rgba(90,120,90,0.18)' : 'rgba(57,255,20,0.30)';
+      ctx.lineWidth = e[2] === 0 ? 0.6 : 1.0;
+      ctx.beginPath();
+      ctx.moveTo(cx + a.x * r, cy + a.y * r);
+      ctx.quadraticCurveTo(cx + mx * r * 0.4, cy + my * r * 0.4, cx + b.x * r, cy + b.y * r);
+      ctx.stroke();
+    }
+    // nodes
+    for (let i = 0; i < atlas.nodes.length; i++) {
+      const x = cx + pos[i].x * r, y = cy + pos[i].y * r;
+      const size = 2 + Math.min(4, deg[i]) + clos[i] * 4;
+      ctx.fillStyle = CAT_COLORS[atlas.nodes[i].cat];
+      ctx.shadowColor = CAT_COLORS[atlas.nodes[i].cat];
+      ctx.shadowBlur = 6;
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+      // name only the famous: the top-centrality vault node per ring
+      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    }
+    ctx.restore();
+
+    // top centrality readout
+    let top = 0, topD = -1;
+    for (let i = 0; i < deg.length; i++) if (deg[i] > topD) { topD = deg[i]; top = i; }
+    rCent.textContent = CAT_NAMES[atlas.nodes[top].cat] + ':' + atlas.nodes[top].id.slice(0, 14);
+    rAtlas.textContent = atlas.nodes.length + 'n · ' + atlas.edges.length + 'e';
+  }
+
+  function drawNAND() {
+    const W = cssW(), H = cssH();
+    const decay = parseFloat(decaySlider.value) / 100;
+    const t = performance.now() / 1000;
+
+    ctx.fillStyle = 'rgba(0,0,0,' + decay + ')';
+    ctx.fillRect(0, 0, W, H);
+    drawGrid();
+
+    if (!atlas) return;
+    const r = Math.min(W, H) * 0.40;
+    const cx = W / 2, cy = H / 2;
+    const pos = nodeLayout(atlas, 7);
+    const deg = lv.degreeCentrality(atlas.nodes.length, atlas.edges);
+    const pat = lv.nandPattern(atlas.nodes.length);      // the grammar ruler
+
+    ctx.save();
+    for (const e of atlas.edges) {
+      const A = (deg[e[0]] % 2 === 0 ? 1 : -1) * pat[e[0] % pat.length];
+      const B = (deg[e[1]] % 2 === 0 ? 1 : -1) * pat[e[1] % pat.length];
+      if (lv.nand(A, B) === -1) continue;                 // only the -1 rows draw
+      const a = pos[e[0]], b = pos[e[1]];
+      const phase = t * 0.7 + e[0];
+      ctx.strokeStyle = 'rgba(57,255,20,0.35)';
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.moveTo(cx + a.x * r, cy + a.y * r);
+      ctx.lineTo(cx + Math.sin(phase) * r * 0.3, cy + Math.cos(phase) * r * 0.3);
+      ctx.lineTo(cx + b.x * r, cy + b.y * r);
+      ctx.stroke();
+    }
+    for (let i = 0; i < atlas.nodes.length; i++) {
+      const p = pat[i % pat.length];
+      const x = cx + pos[i].x * r, y = cy + pos[i].y * r;
+      ctx.fillStyle = p === 1 ? '#39ff14' : '#1c2a1c';
+      ctx.beginPath();
+      ctx.arc(x, y, 3 + (deg[i] % 3), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    rCent.textContent = 'nand-ruler · ' + pat.length + ' bits';
+    rAtlas.textContent = '⊼ ' + atlas.nodes.length + 'n';
+  }
+
+  // ── video ─────────────────────────────────────────────────────
+  function showVideo() {
+    vidLayer.classList.remove('hidden');
+    rMode.textContent = 'KNOWN UNIVERSE';
+    led.classList.add('on');
+  }
+  vidClose.addEventListener('click', function () { vidLayer.classList.add('hidden'); });
+
+  // ── audio ────────────────────────────────────────────────────
+  async function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      rSr.textContent = audioCtx.sampleRate.toLocaleString();
+    }
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+  }
+  function createAnalyser() {
+    if (!audioCtx) return;
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.1;
+    timeBuffer = new Uint8Array(analyser.fftSize);
+  }
+  function disconnectSource() {
+    if (source) { try { source.disconnect(); } catch (e) { /* already gone */ } source = null; }
+    if (micStream) { micStream.getTracks().forEach(function (tr) { tr.stop(); }); micStream = null; }
+  }
+  async function startMic() {
+    try {
+      await initAudio();
+      disconnectSource();
+      createAnalyser();
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      source = audioCtx.createMediaStreamSource(micStream);
+      source.connect(analyser);
+      led.classList.add('on');
+      rMode.textContent = 'MICROPHONE';
+    } catch (err) {
+      console.warn('mic unavailable, demo fallback:', err);
+      mode = 'sine'; setActive(btns.sine); startDemo('sine');
+    }
+  }
+  async function startOutput() {
+    try {
+      await initAudio();
+      disconnectSource();
+      createAnalyser();
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      stream.getVideoTracks().forEach(function (tr) { tr.stop(); });
+      micStream = stream;
+      source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+      led.classList.add('on');
+      rMode.textContent = 'OUTPUT';
+    } catch (err) {
+      console.warn('output capture unavailable:', err);
+      mode = 'sine'; setActive(btns.sine); startDemo('sine');
+    }
+  }
+  function startDemo(type) {
+    disconnectSource();
+    rMode.textContent = type.toUpperCase();
+    led.classList.add('on');
+  }
+
+  // ── mode dispatch ─────────────────────────────────────────────
+  function setActive(btn) {
+    Object.keys(btns).forEach(function (k) { btns[k].classList.remove('active'); });
+    btn.classList.add('active');
+  }
+  function setMode(m, btn, cap) {
+    mode = m;
+    setActive(btn);
+    caption.textContent = cap;
+    vidLayer.classList.add('hidden');
+  }
+
+  btns.mic.addEventListener('click', function () { setMode('mic', btns.mic, CAPTIONS.mic); startMic(); });
+  btns.output.addEventListener('click', function () { setMode('output', btns.output, CAPTIONS.output); startOutput(); });
+  btns.sine.addEventListener('click', function () { setMode('sine', btns.sine, CAPTIONS.sine); disconnectSource(); initAudio(); startDemo('sine'); demoFreq = 220; });
+  btns.sawtooth.addEventListener('click', function () { setMode('sawtooth', btns.sawtooth, CAPTIONS.sawtooth); disconnectSource(); initAudio(); startDemo('sawtooth'); demoFreq = 110; });
+  btns.noise.addEventListener('click', function () { setMode('noise', btns.noise, CAPTIONS.noise); disconnectSource(); initAudio(); startDemo('noise'); });
+  btns.lissajous.addEventListener('click', function () { setMode('lissajous', btns.lissajous, CAPTIONS.lissajous); disconnectSource(); led.classList.add('on'); });
+  btns.universe.addEventListener('click', function () { setMode('universe', btns.universe, CAPTIONS.universe); disconnectSource(); led.classList.add('on'); });
+  btns.nand.addEventListener('click', function () { setMode('nand', btns.nand, CAPTIONS.nand); disconnectSource(); led.classList.add('on'); });
+  btns.video.addEventListener('click', function () { setMode('video', btns.video, CAPTIONS.video); disconnectSource(); showVideo(); });
+
+  // ── slider / select wiring ────────────────────────────────────
+  gainSlider.addEventListener('input', function () { gainVal.textContent = gainSlider.value; });
+  timebaseSlider.addEventListener('input', function () { timebaseVal.textContent = timebaseSlider.value + ' ms/div'; });
+  triggerSlider.addEventListener('input', function () { triggerVal.textContent = triggerSlider.value; });
+  decaySlider.addEventListener('input', function () { decayVal.textContent = decaySlider.value; });
+  weaveSlider.addEventListener('input', function () { weaveVal.textContent = weaveSlider.value; });
+
+  // ── atlas load (the crawl rides in) ───────────────────────────
+  const STUB = [
+    { id: 'readability-is-freedom', title: 'Readability Is Freedom', url: 'https://standardgalactic.github.io/diatribe/', cat: 'vault', hop: 0 },
+    { id: 'manufactured-necessity', title: 'Manufactured Necessity', url: 'https://standardgalactic.github.io/diatribe/manufactured-necessity.pdf', cat: 'vault', hop: 0 },
+    { id: 'contrast-as-control', title: 'Contrast as Control', url: 'https://standardgalactic.github.io/diatribe/contrast-as-control.pdf', cat: 'vault', hop: 0 },
+    { id: 'conditioned-emptiness', title: 'Conditioned Emptiness', url: 'https://standardgalactic.github.io/diatribe/conditioned-emptiness.pdf', cat: 'vault', hop: 0 },
+    { id: 'the-pop-protocol', title: 'The POP Protocol', url: 'https://github.com/8b-is/training-pipeline', cat: 'vault', hop: 0 },
+    { id: 'lissajous-curve', title: 'Lissajous curve', url: 'https://en.wikipedia.org/wiki/Lissajous_curve', cat: 'logic', hop: 0 },
+    { id: 'nand-gate', title: 'NAND gate', url: 'https://en.wikipedia.org/wiki/NAND_gate', cat: 'logic', hop: 0 },
+    { id: 'observable-universe', title: 'Observable universe', url: 'https://en.wikipedia.org/wiki/Observable_universe', cat: 'cosmos', hop: 0 },
+    { id: 'milky-way', title: 'Milky Way', url: 'https://en.wikipedia.org/wiki/Milky_Way', cat: 'cosmos', hop: 0 },
+    { id: 'simon-kuznets', title: 'Simon Kuznets · GNP', url: 'https://www.nobelprize.org/prizes/economic-sciences/1971/kuznets/facts/', cat: 'cosmos', hop: 0 },
+    { id: '8b-is-engine', title: '8b-is-engine', url: 'https://github.com/8b-is/8b-is-engine', cat: 'fleet', hop: 0 }
+  ];
+
+  fetch('data/atlas.jsonl')
+    .then(function (r) { if (!r.ok) throw new Error('no atlas'); return r.text(); })
+    .then(function (txt) {
+      const rows = txt.split('\n').filter(Boolean).map(function (line) { try { return JSON.parse(line); } catch (e) { return null; } }).filter(Boolean);
+      atlas = lv.buildAtlas(rows.length ? rows : STUB);
+      rAtlas.textContent = atlas.nodes.length + 'n · ' + atlas.edges.length + 'e';
+    })
+    .catch(function () {
+      atlas = lv.buildAtlas(STUB);
+      rAtlas.textContent = atlas.nodes.length + 'n (stub)';
+    });
+
+  // ── tick ──────────────────────────────────────────────────────
+  function tick() {
+    requestAnimationFrame(tick);
+    if (mode === 'lissajous') { drawLissajous(); return; }
+    if (mode === 'universe') { drawGraph(); return; }
+    if (mode === 'nand') { drawNAND(); return; }
+    if (mode === 'video') { drawLissajous(); return; }   // the scope keeps weaving behind the film
+
+    let data;
+    const liveAudio = (mode === 'mic' || mode === 'output');
+    if (liveAudio && analyser) {
+      analyser.getByteTimeDomainData(timeBuffer);
+      data = timeBuffer;
+    } else if (liveAudio) {
+      data = generateDemoBuffer('sine');
+    } else {
+      data = generateDemoBuffer(mode);
+    }
+    drawTrace(data);
+    triggerVal.textContent = triggerSlider.value;
+  }
+
+  // ── REC → HF (same contract as the OSC-9000 fork) ─────────────
+  const btnRecord = document.getElementById('btn-record');
+  const recStatus = document.getElementById('rec-status');
+  const CAPTURE_MS = 1000, UPLOAD_MS = 60000;
+  let recording = false, frames = [], sessionId = null, lastCapture = 0, uploadTimer = null, uploadedTotal = 0;
+
+  function newSession() {
+    return 'sess-' + new Date().toISOString().replace(/[:.]/g, '-') + '-' + Math.random().toString(36).slice(2, 8);
+  }
+  function captureFrame() {
+    frames.push({ t: Date.now(), mode: mode, freq: rFreq.textContent, amp: rAmp.textContent,
+      gain: parseFloat(gainSlider.value), tb: parseFloat(timebaseSlider.value),
+      atlas: atlas ? { n: atlas.nodes.length, e: atlas.edges.length } : null });
+  }
+  async function uploadFrames() {
+    if (!frames.length) { if (recording) recStatus.textContent = '● REC → HF · buffer empty'; return; }
+    const batch = frames; frames = [];
+    recStatus.className = 'rec-status live';
+    recStatus.textContent = 'uploading ' + batch.length + ' frames…';
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, startedAt: batch[0].t, count: batch.length, ua: navigator.userAgent, frames: batch })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const j = await res.json().catch(function () { return {}; });
+      uploadedTotal += batch.length;
+      recStatus.className = 'rec-status live';
+      recStatus.textContent = '● REC → HF · ' + uploadedTotal + ' frames · ' + (j.path || 'committed');
+    } catch (err) {
+      frames = batch.concat(frames);
+      recStatus.className = 'rec-status err';
+      recStatus.textContent = 'upload failed: ' + err.message + ' · will retry';
+    }
+  }
+  btnRecord.addEventListener('click', function () {
+    if (recording) {
+      recording = false;
+      clearInterval(uploadTimer); uploadTimer = null;
+      btnRecord.classList.remove('recording');
+      btnRecord.textContent = '◉ REC → HF (off)';
+      uploadFrames();
+    } else {
+      recording = true;
+      sessionId = newSession();
+      frames = []; uploadedTotal = 0; lastCapture = 0;
+      btnRecord.classList.add('recording');
+      btnRecord.textContent = '■ STOP REC';
+      recStatus.className = 'rec-status live';
+      recStatus.textContent = '● REC → HF · capturing…';
+      uploadTimer = setInterval(uploadFrames, UPLOAD_MS);
+    }
+  });
+
+  // ── boot ──────────────────────────────────────────────────────
+  const ro = new ResizeObserver(function () { resizeCanvas(); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cssW(), cssH()); drawGrid(); });
+  ro.observe(canvas);
+  resizeCanvas();
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, cssW(), cssH());
+  drawGrid();
+  tick();
+  startMic();
+})();
+</script>
+</body>
+</html>

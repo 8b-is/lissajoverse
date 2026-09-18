@@ -1,0 +1,37 @@
+# lissajoverse
+
+> The observable universe as a lissajous graph: a retro oscilloscope reborn
+> with the constellation's surfaces — the vault's papers, a robots-respecting
+> wiki crawl, a NOT-NAND grammar, and The Known Universe.
+
+Source: https://github.com/8b-is/lissajoverse
+Live: https://oscilloscope.vaked.dev/
+
+## What it is
+
+- A single-file retro oscilloscope (microphone / output / sine / sawtooth /
+  noise) with a lissajous weave: ratio selector (1:1 · 2:3 · 3:4 · 5:8 · 8:13),
+  up to seven traces, seeded phase drift
+- A universe mode: the atlas (vault papers · fleet · logic seeds · cosmos
+  seeds) drawn as a graph on a seeded starfield, edges as lissajous chords,
+  degree + closeness centralities mirroring 8b-is-engine's UltraGraph
+- A NAND mode: the graph re-woven through the ternary NOT-NAND grammar
+- The Known Universe (AMNH) × Time (We Plants Are Happy Plants remix) as a
+  video layer
+- A robots.txt-respecting wikipedia crawl rig (tools/wikicrawl.py) feeding
+  data/atlas.jsonl
+
+## Key data
+
+- data/seeds.json — static seeds: the diatribe shelf, the vault, the fleet,
+  logic + cosmos (incl. Hayden Planetarium, Digital Universe Atlas, Uniview,
+  Simon Kuznets, leekHotline)
+- data/atlas.jsonl — the committed atlas
+- tools/wikicrawl.py — the polite crawl (article-HTML channel only)
+- selftest.mjs + e2e.sh — the corridor
+
+## Doctrinal notes
+
+Readability is freedom: every mechanism in the page is inspectable, every
+behavior is test-pinned, every wall (crawl starvation, HF secret, domain
+ownership) is recorded in PLAN.md instead of hidden.

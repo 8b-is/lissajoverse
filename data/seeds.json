@@ -1,0 +1,53 @@
+{
+  "vault": [
+    { "id": "manufactured-necessity", "title": "Manufactured Necessity", "url": "https://standardgalactic.github.io/diatribe/manufactured-necessity.pdf" },
+    { "id": "conditioned-emptiness", "title": "Conditioned Emptiness", "url": "https://standardgalactic.github.io/diatribe/conditioned-emptiness.pdf" },
+    { "id": "economy-of-replaced-things", "title": "The Economy of Replaced Things", "url": "https://standardgalactic.github.io/diatribe/economy-of-replaced-things.pdf" },
+    { "id": "artificial-scarcity", "title": "Artificial Scarcity", "url": "https://standardgalactic.github.io/diatribe/artificial-scarcity.pdf" },
+    { "id": "needless-miles", "title": "Needless Miles", "url": "https://standardgalactic.github.io/diatribe/needless-miles.pdf" },
+    { "id": "borrowed-climate", "title": "Borrowed Climate", "url": "https://standardgalactic.github.io/diatribe/borrowed-climate.pdf" },
+    { "id": "merchants-of-lack", "title": "Merchants of Lack", "url": "https://standardgalactic.github.io/diatribe/merchants-of-lack.pdf" },
+    { "id": "disposable-ceremony", "title": "Disposable Ceremony", "url": "https://standardgalactic.github.io/diatribe/disposable-ceremony.pdf" },
+    { "id": "purple-people-eaters", "title": "Purple People Eaters", "url": "https://standardgalactic.github.io/diatribe/purple-people-eaters.pdf" },
+    { "id": "revenue-from-weakness", "title": "Revenue from Weakness", "url": "https://standardgalactic.github.io/diatribe/revenue-from-weakness.pdf" },
+    { "id": "contrast-as-control", "title": "Contrast as Control", "url": "https://standardgalactic.github.io/diatribe/contrast-as-control.pdf" },
+    { "id": "readability-is-freedom", "title": "Readability Is Freedom", "url": "https://github.com/peterlodri-sec/8b-is/blob/main/raw_research/readability-is-freedom-absorbed.md" },
+    { "id": "the-pop-protocol", "title": "The POP Protocol", "url": "https://github.com/8b-is/training-pipeline" }
+  ],
+  "logic": [
+    { "id": "lissajous-curve", "title": "Lissajous curve", "url": "https://en.wikipedia.org/wiki/Lissajous_curve" },
+    { "id": "nand-gate", "title": "NAND gate", "url": "https://en.wikipedia.org/wiki/NAND_gate" },
+    { "id": "boolean-algebra", "title": "Boolean algebra", "url": "https://en.wikipedia.org/wiki/Boolean_algebra" },
+    { "id": "three-valued-logic", "title": "Three-valued logic", "url": "https://en.wikipedia.org/wiki/Three-valued_logic" },
+    { "id": "analog-computer", "title": "Analog computer", "url": "https://en.wikipedia.org/wiki/Analog_computer" },
+    { "id": "oscilloscope", "title": "Oscilloscope", "url": "https://en.wikipedia.org/wiki/Oscilloscope" }
+  ],
+  "cosmos": [
+    { "id": "observable-universe", "title": "Observable universe", "url": "https://en.wikipedia.org/wiki/Observable_universe" },
+    { "id": "big-bang", "title": "Big Bang", "url": "https://en.wikipedia.org/wiki/Big_Bang" },
+    { "id": "universe", "title": "Universe", "url": "https://en.wikipedia.org/wiki/Universe" },
+    { "id": "milky-way", "title": "Milky Way", "url": "https://en.wikipedia.org/wiki/Milky_Way" },
+    { "id": "galaxy", "title": "Galaxy", "url": "https://en.wikipedia.org/wiki/Galaxy" },
+    { "id": "star", "title": "Star", "url": "https://en.wikipedia.org/wiki/Star" },
+    { "id": "planet", "title": "Planet", "url": "https://en.wikipedia.org/wiki/Planet" },
+    { "id": "nebula", "title": "Nebula", "url": "https://en.wikipedia.org/wiki/Nebula" },
+    { "id": "quasar", "title": "Quasar", "url": "https://en.wikipedia.org/wiki/Quasar" },
+    { "id": "cosmic-microwave-background", "title": "Cosmic microwave background", "url": "https://en.wikipedia.org/wiki/Cosmic_microwave_background" },
+    { "id": "astrophysics", "title": "Astrophysics", "url": "https://en.wikipedia.org/wiki/Astrophysics" },
+    { "id": "cosmology", "title": "Cosmology", "url": "https://en.wikipedia.org/wiki/Cosmology" },
+    { "id": "digital-universe-atlas", "title": "Digital Universe Atlas", "url": "https://www.amnh.org/research/hayden-planetarium" },
+    { "id": "uniview", "title": "Uniview (SCISS)", "url": "https://www.sciss.se/" },
+    { "id": "amnh-hayden-planetarium", "title": "AMNH Hayden Planetarium", "url": "https://www.amnh.org/research/hayden-planetarium" },
+    { "id": "simon-kuznets", "title": "Simon Kuznets", "url": "https://en.wikipedia.org/wiki/Simon_Kuznets" },
+    { "id": "gross-national-income", "title": "Gross national income", "url": "https://en.wikipedia.org/wiki/Gross_national_income" }
+  ],
+  "fleet": [
+    { "id": "8b-is-engine", "title": "8b-is-engine", "url": "https://github.com/8b-is/8b-is-engine" },
+    { "id": "training-pipeline", "title": "training-pipeline", "url": "https://github.com/8b-is/training-pipeline" },
+    { "id": "music-vaked-dev", "title": "music.vaked.dev", "url": "https://github.com/peterlodri-sec/music.vaked.dev" },
+    { "id": "wa-stream", "title": "wa-stream", "url": "https://github.com/8b-is/wa-stream" },
+    { "id": "qbit-protein-studio", "title": "qbit-protein-studio", "url": "https://github.com/8b-is/qbit-protein-studio" },
+    { "id": "lissajoverse", "title": "lissajoverse", "url": "https://oscilloscope.vaked.dev/" },
+    { "id": "leekhotline", "title": "leekHotline · embrace ai", "url": "https://github.com/leekHotline" }
+  ]
+}
