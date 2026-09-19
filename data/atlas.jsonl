@@ -17,6 +17,7 @@
 {"id": "three-valued-logic", "title": "Three-valued logic", "url": "https://en.wikipedia.org/wiki/Three-valued_logic", "cat": "logic", "hop": 0, "source": "static"}
 {"id": "analog-computer", "title": "Analog computer", "url": "https://en.wikipedia.org/wiki/Analog_computer", "cat": "logic", "hop": 0, "source": "static"}
 {"id": "oscilloscope", "title": "Oscilloscope", "url": "https://en.wikipedia.org/wiki/Oscilloscope", "cat": "logic", "hop": 0, "source": "static"}
+{"id": "pure-mathematics", "title": "Pure mathematics", "url": "https://en.wikipedia.org/wiki/Pure_mathematics", "cat": "logic", "hop": 0, "source": "static"}
 {"id": "observable-universe", "title": "Observable universe", "url": "https://en.wikipedia.org/wiki/Observable_universe", "cat": "cosmos", "hop": 0, "source": "static"}
 {"id": "big-bang", "title": "Big Bang", "url": "https://en.wikipedia.org/wiki/Big_Bang", "cat": "cosmos", "hop": 0, "source": "static"}
 {"id": "universe", "title": "Universe", "url": "https://en.wikipedia.org/wiki/Universe", "cat": "cosmos", "hop": 0, "source": "static"}
@@ -34,6 +35,7 @@
 {"id": "amnh-hayden-planetarium", "title": "AMNH Hayden Planetarium", "url": "https://www.amnh.org/research/hayden-planetarium", "cat": "cosmos", "hop": 0, "source": "static"}
 {"id": "simon-kuznets", "title": "Simon Kuznets", "url": "https://en.wikipedia.org/wiki/Simon_Kuznets", "cat": "cosmos", "hop": 0, "source": "static"}
 {"id": "gross-national-income", "title": "Gross national income", "url": "https://en.wikipedia.org/wiki/Gross_national_income", "cat": "cosmos", "hop": 0, "source": "static"}
+{"id": "margaret-hamilton-·-the-agc", "title": "Margaret Hamilton · the AGC", "url": "https://en.wikipedia.org/wiki/Margaret_Hamilton_(software_engineer)", "cat": "cosmos", "hop": 0, "source": "static"}
 {"id": "8b-is-engine", "title": "8b-is-engine", "url": "https://github.com/8b-is/8b-is-engine", "cat": "fleet", "hop": 0, "source": "static"}
 {"id": "training-pipeline", "title": "training-pipeline", "url": "https://github.com/8b-is/training-pipeline", "cat": "fleet", "hop": 0, "source": "static"}
 {"id": "music.vaked.dev", "title": "music.vaked.dev", "url": "https://github.com/peterlodri-sec/music.vaked.dev", "cat": "fleet", "hop": 0, "source": "static"}
@@ -42,5 +44,6 @@
 {"id": "lissajoverse", "title": "lissajoverse", "url": "https://oscilloscope.vaked.dev/", "cat": "fleet", "hop": 0, "source": "static"}
 {"id": "leekhotline-·-embrace-ai", "title": "leekHotline · embrace ai", "url": "https://github.com/leekHotline", "cat": "fleet", "hop": 0, "source": "static"}
 {"id": "main-page", "title": "Main Page", "url": "https://en.wikipedia.org/wiki/Main_Page", "cat": "cosmos", "hop": 1, "source": "wiki"}
-{"id": "margaret-hamilton", "title": "Margaret Hamilton · the AGC", "url": "https://en.wikipedia.org/wiki/Margaret_Hamilton_(software_engineer)", "cat": "cosmos", "hop": 0, "source": "static"}
-{"id": "pure-mathematics", "title": "Pure mathematics", "url": "https://en.wikipedia.org/wiki/Pure_mathematics", "cat": "logic", "hop": 0, "source": "static"}
+{"id": "margaret-hamilton-(software-engineer)", "title": "Margaret Hamilton (software engineer)", "url": "https://en.wikipedia.org/wiki/Margaret_Hamilton_%28software_engineer%29", "cat": "cosmos", "hop": 1, "source": "wiki"}
+{"id": "admissible-degradation", "title": "Admissible Degradation", "url": "https://standardgalactic.github.io/research-projects/admissibility-lab/admissible-degradation.pdf", "cat": "vault", "hop": 0, "source": "static"}
+{"id": "permag", "title": "permag", "url": "https://github.com/standardgalactic/permag", "cat": "vault", "hop": 0, "source": "static"}

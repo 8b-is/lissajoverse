@@ -64,6 +64,16 @@
       "id": "the-pop-protocol",
       "title": "The POP Protocol",
       "url": "https://github.com/8b-is/training-pipeline"
+    },
+    {
+      "id": "admissible-degradation",
+      "title": "Admissible Degradation",
+      "url": "https://standardgalactic.github.io/research-projects/admissibility-lab/admissible-degradation.pdf"
+    },
+    {
+      "id": "permag",
+      "title": "permag",
+      "url": "https://github.com/standardgalactic/permag"
     }
   ],
   "logic": [
