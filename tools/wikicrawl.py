@@ -80,10 +80,12 @@ SKIP_PREFIXES = ("Special:", "Talk:", "User:", "User talk:", "Wikipedia:",
                  "Topic:")
 
 
-def page_links(title, limit):
+def page_links(title, limit, path=None):
     """First `limit` sorted outbound article titles for a wiki page, parsed
-    from the article HTML the robots.txt permits us to read."""
-    path = "/wiki/" + urllib.parse.quote(title.replace(" ", "_"))
+    from the article HTML the robots.txt permits us to read. An explicit
+    path (from the seed's own URL) wins over the display title."""
+    if path is None:
+        path = "/wiki/" + urllib.parse.quote(title.replace(" ", "_"))
     if not allowed(WIKI + path):
         return []
     req = urllib.request.Request(WIKI + path, headers={"User-Agent": UA})
@@ -148,24 +150,30 @@ def main():
     print(f"robots: {ROBOTS_URL} parsed, crawlAllowed(wiki) = "
           f"{allowed(WIKI + '/wiki/Observable_universe')}")
 
-    # hop 1..N: expand only the wiki-dwelling seeds (cosmos + logic)
+    # hop 1..N: expand only the wiki-dwelling seeds (cosmos + logic);
+    # a seed's own URL wins over its display title, and external sources
+    # (amnh, sciss, github, the diatribe pdfs) are atlas-static, never crawled
     if not args.dry_run:
-        frontier = [(it["title"], c, 1)
-                    for c in ("cosmos", "logic")
-                    for it in seeds.get(c, [])]
+        frontier = []
+        for c in ("cosmos", "logic"):
+            for it in seeds.get(c, []):
+                url = it.get("url") or url_of(it["title"])
+                if url.startswith(WIKI + "/wiki/"):
+                    p = urllib.parse.urlparse(url).path
+                    frontier.append((it["title"], p, c, 1))
         for step in range(1, args.hops + 1):
             next_frontier = []
-            for title, cat, hop in frontier:
+            for title, path, cat, hop in frontier:
                 if len(seen) >= args.max_nodes:
                     break
-                links = page_links(title, args.per_page)
+                links = page_links(title, args.per_page, path)
                 time.sleep(args.sleep)
                 for t in links:
                     if len(seen) >= args.max_nodes:
                         break
                     add(cat, t, url_of(t), hop, "wiki")
                     if hop < args.hops:
-                        next_frontier.append((t, cat, hop + 1))
+                        next_frontier.append((t, None, cat, hop + 1))
             frontier = next_frontier
             if not frontier:
                 break
