@@ -56,8 +56,8 @@ def robots(agent=UA):
             req = urllib.request.Request(ROBOTS_URL, headers={"User-Agent": agent})
             with urllib.request.urlopen(req, timeout=20) as r:
                 rp.parse(r.read().decode().splitlines())
-        except Exception as e:  # noqa: BLE001 - network/parse walls degrade to allow
-            print(f"  ! robots unreadable ({e}) -> default allow")
+        except Exception as e:  # noqa: BLE001 - unavailable rules disable the crawl
+            print(f"  ! robots unreadable ({e}) -> crawl disabled")
             rp = None
         ROBOTS_CACHE[agent] = rp
     return ROBOTS_CACHE[agent]
@@ -66,7 +66,7 @@ def robots(agent=UA):
 def allowed(url, agent=UA):
     rp = robots(agent)
     if rp is None:
-        return True
+        return False
     return rp.can_fetch(agent, url)
 
 

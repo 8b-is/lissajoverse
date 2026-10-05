@@ -98,6 +98,8 @@ const allFinite = (arr) => arr.every(v => Number.isFinite(v));
   ok('closeness center beats leaves', c[1] > c[0] && c[1] > c[2]);
   const iz = lv.closeness(3, []);
   ok('closeness isolated graph is zero', iz.every(v => v === 0));
+  ok('closeness singleton is zero', lv.closeness(1, [])[0] === 0);
+  ok('closeness empty graph is empty', lv.closeness(0, []).length === 0);
 }
 
 // 7. buildAtlas
