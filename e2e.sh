@@ -46,6 +46,9 @@ PY
 echo "-- node: engine selftest"
 node selftest.mjs || fail=1
 
+echo "-- node: recording session isolation (mocked uploads)"
+node tests/recording-session.mjs || fail=1
+
 echo "-- robot: ours honours the robots"
 [ -f robots.txt ] && echo "   ok robots.txt present" || { echo "   FAIL"; fail=1; }
 

@@ -901,21 +901,23 @@
   }
   async function uploadFrames() {
     if (!frames.length) { if (recording) recStatus.textContent = '● REC → HF · buffer empty'; return; }
-    const batch = frames; frames = [];
+    const batch = frames, batchSession = sessionId; frames = [];
     recStatus.className = 'rec-status live';
     recStatus.textContent = 'uploading ' + batch.length + ' frames…';
     try {
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session: sessionId, startedAt: batch[0].t, count: batch.length, ua: navigator.userAgent, frames: batch })
+        body: JSON.stringify({ session: batchSession, startedAt: batch[0].t, count: batch.length, ua: navigator.userAgent, frames: batch })
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const j = await res.json().catch(function () { return {}; });
+      if (sessionId !== batchSession) return;
       uploadedTotal += batch.length;
       recStatus.className = 'rec-status live';
       recStatus.textContent = '● REC → HF · ' + uploadedTotal + ' frames · ' + (j.path || 'committed');
     } catch (err) {
+      if (sessionId !== batchSession) return;
       frames = batch.concat(frames);
       recStatus.className = 'rec-status err';
       recStatus.textContent = 'upload failed: ' + err.message + ' · will retry';
