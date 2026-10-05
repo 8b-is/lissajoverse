@@ -292,7 +292,7 @@
       }
       let sum = 0;
       for (let i = 0; i < n; i++) if (i !== s && dist[i] > 0) sum += 1 / dist[i];
-      out[s] = sum / (n - 1);
+      out[s] = n > 1 ? sum / (n - 1) : 0;
     }
     return out;
   }

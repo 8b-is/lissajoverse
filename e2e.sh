@@ -9,6 +9,9 @@ fail=0
 echo "-- python: crawler compiles"
 python3 -m py_compile tools/wikicrawl.py && echo "   ok py_compile" || { echo "   FAIL"; fail=1; }
 
+echo "-- python: robots failure handling (mocked network)"
+python3 -m unittest discover -s tests || fail=1
+
 echo "-- python: seeds parse"
 python3 - <<'PY'
 import json
