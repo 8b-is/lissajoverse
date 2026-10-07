@@ -66,6 +66,9 @@ HF stays dark (503, honest) until HF_TOKEN exists server-side.
 AMNH Hayden Planetarium (the Digital Universe Atlas lineage) · Uniview by
 SCISS (the sibling instrument) · The Known Universe (Visions of the Cosmos,
 Rubin Museum exhibit) · Nate (the diatribe shelf) · Wikipedia, crawled with
-robots.txt respect · the constellation, whose doctrine this page is.
+robots.txt respect · oscilloscope music, the genre the scope was built for:
+Jerobeam Fenderson, *Spirals* (Oscilloscope Music) and the rest of that album,
+where a stereo signal is the drawing · the constellation, whose doctrine this
+page is.
 
 SPDX-License-Identifier: AGPL-3.0-only
