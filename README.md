@@ -10,7 +10,8 @@
 > written against property law — written by the fleet. 8b-is · 2026-09-18
 
 Live at [oscilloscope.vaked.dev](https://oscilloscope.vaked.dev/) · a landing
-page at [`landing.html`](./landing.html) (hero + the modes + the lineage) · source
+page at [`landing.html`](./landing.html) (hero + the modes + the lineage) served
+short at [lissaj.vaked.dev](https://lissaj.vaked.dev/) · source
 under 8b-is · renames the working title "crossmap" into the constellation
 (the crossed maps the lissajous weaves).
 
