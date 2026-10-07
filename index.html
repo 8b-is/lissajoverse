@@ -212,7 +212,6 @@
 <div id="vid-layer" class="hidden">
   <button id="vid-close" aria-label="close video">✕ CLOSE</button>
   <iframe id="vid-frame" title="The Known Universe × Time (We Plants Are Happy Plants Remix)"
-    src="https://www.youtube-nocookie.com/embed/DVPcDNwcgbI?rel=0&modestbranding=1"
     frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen></iframe>
 </div>
@@ -422,6 +421,9 @@
   };
   const vidLayer = document.getElementById('vid-layer');
   const vidClose = document.getElementById('vid-close');
+  const vidFrame = document.getElementById('vid-frame');
+  // single source of truth: the iframe src comes from the tested core constant
+  if (vidFrame && lv && lv.VIDEO_URL) vidFrame.src = lv.VIDEO_URL;
 
   const CAPTIONS = {
     mic: 'the microphone is a witness: every sound is a mechanism requesting inspection.',

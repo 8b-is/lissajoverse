@@ -56,10 +56,9 @@ run lives in docs/REVIEW.md.
 2. **the REC → HF upload needs a server-side secret**: `HF_TOKEN` unset →
    503 with an honest message; frames stay client-side and retry. Nothing
    leaves the origin until the operator sets the secret.
-3. **the domain**: oscilloscope.vaked.dev is the target; deploy needs the
-   Cloudflare account whose Pages project owns it (wrangler auth + project
-   name). Until then the repo is the source of truth and the instruction
-   is one command.
+3. **the domain**: *resolved* — oscilloscope.vaked.dev is live (verified 200,
+   2026-10-07). The Pages project owns the domain; the repo stays the source
+   of truth and the deploy is one command.
 4. **AMNH all-data**: the full Digital Universe Atlas cannot ride in a
    static page; the film, the links, and the seeded starfield carry the
    mapping, and the crawl can grow the neighbourhood over time.
