@@ -9,7 +9,8 @@
 > It lives in the same wavelength it creates: the line which mates —
 > written against property law — written by the fleet. 8b-is · 2026-09-18
 
-Live at [oscilloscope.vaked.dev](https://oscilloscope.vaked.dev/) · source
+Live at [oscilloscope.vaked.dev](https://oscilloscope.vaked.dev/) · a landing
+page at [`landing.html`](./landing.html) (hero + the modes + the lineage) · source
 under 8b-is · renames the working title "crossmap" into the constellation
 (the crossed maps the lissajous weaves).
 
