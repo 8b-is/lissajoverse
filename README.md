@@ -27,6 +27,15 @@ under 8b-is · renames the working title "crossmap" into the constellation
 - **Known Universe** — The AMNH film × Zimmer's Time (We Plants Are Happy
   Plants remix), the scope keeps weaving behind it
 
+## the feedback knob
+
+- **Feedback** — the organic loop over any mode: each frame is carried forward,
+  zoomed and rotated a little, and added back with `lighter`, so the vector
+  phosphor stacks into a kaleidoscope. It defaults to `0` — the faithful scope —
+  and the amount is the only control; the pure core is untouched.
+- deep-link the knobs for shots and the corridor:
+  `?mode=lissajous&feedback=70`.
+
 ## the data
 
 - the atlas core: the diatribe shelf (Nate/Flyxion's eleven essays),
