@@ -16,7 +16,7 @@ under 8b-is · renames the working title "crossmap" into the constellation
 ## the modes
 
 - **Mic / Output / Sine / Saw / Noise** — the faithful OSC-9000 scope, kept
-- **Lissajous** — ratio selector (1:1 · 2:3 · 3:4 · 5:8 · 8:13 · 13:21 · 21:34),
+- **Lissajous** — ratio selector (1:1 · 2:3 · 3:2 · 3:4 · 5:8 · 8:13 · 13:21 · 21:34 · 34:55),
   1..7 woven traces, seeded phase drift
 - **Universe** — the atlas as a graph: vault · fleet · logic · cosmos rings
   on a seeded starfield, edges as lissajous chords, UltraGraph-parity
