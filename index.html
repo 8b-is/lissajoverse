@@ -163,12 +163,20 @@
         <option value="5,8">5 : 8</option>
         <option value="3,2">3 : 2</option>
         <option value="8,13">8 : 13</option>
+        <option value="13,21">13 : 21</option>
+        <option value="21,34">21 : 34</option>
+        <option value="34,55">34 : 55</option>
       </select>
     </div>
     <div class="ctrl-group">
       <label for="weave">Weave (traces)</label>
       <input type="range" id="weave" min="1" max="7" value="3" aria-label="Weave count"/>
       <div class="ctrl-value" id="weave-val">3</div>
+    </div>
+    <div class="ctrl-group">
+      <label for="feedback">Feedback</label>
+      <input type="range" id="feedback" min="0" max="100" value="0" aria-label="Organic feedback amount"/>
+      <div class="ctrl-value" id="feedback-val">0</div>
     </div>
   </div>
 
@@ -209,7 +217,6 @@
 <div id="vid-layer" class="hidden">
   <button id="vid-close" aria-label="close video">✕ CLOSE</button>
   <iframe id="vid-frame" title="The Known Universe × Time (We Plants Are Happy Plants Remix)"
-    src="https://www.youtube-nocookie.com/embed/DVPcDNwcgbI?rel=0&modestbranding=1"
     frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen></iframe>
 </div>
@@ -392,12 +399,14 @@
   const decaySlider = document.getElementById('decay');
   const weaveSlider = document.getElementById('weave');
   const ratioSelect = document.getElementById('ratio');
+  const feedbackSlider = document.getElementById('feedback');
 
   const gainVal = document.getElementById('gain-val');
   const timebaseVal = document.getElementById('timebase-val');
   const triggerVal = document.getElementById('trigger-val');
   const decayVal = document.getElementById('decay-val');
   const weaveVal = document.getElementById('weave-val');
+  const feedbackVal = document.getElementById('feedback-val');
 
   const rFreq = document.getElementById('r-freq');
   const rAmp = document.getElementById('r-amp');
@@ -419,6 +428,9 @@
   };
   const vidLayer = document.getElementById('vid-layer');
   const vidClose = document.getElementById('vid-close');
+  const vidFrame = document.getElementById('vid-frame');
+  // single source of truth: the iframe src comes from the tested core constant
+  if (vidFrame && lv && lv.VIDEO_URL) vidFrame.src = lv.VIDEO_URL;
 
   const CAPTIONS = {
     mic: 'the microphone is a witness: every sound is a mechanism requesting inspection.',
@@ -835,6 +847,16 @@
   triggerSlider.addEventListener('input', function () { triggerVal.textContent = triggerSlider.value; });
   decaySlider.addEventListener('input', function () { decayVal.textContent = decaySlider.value; });
   weaveSlider.addEventListener('input', function () { weaveVal.textContent = weaveSlider.value; });
+  feedbackSlider.addEventListener('input', function () { feedbackVal.textContent = feedbackSlider.value; });
+
+  // deep-link the knobs (the corridor and screenshots use this): ?feedback=70&mode=lissajous
+  (function () {
+    const qp = new URLSearchParams(location.search);
+    if (qp.has('feedback')) feedbackSlider.value = qp.get('feedback');
+    feedbackVal.textContent = feedbackSlider.value;
+    const wantMode = qp.get('mode');
+    if (wantMode) { const b = document.getElementById('btn-' + wantMode); if (b) b.click(); }
+  })();
 
   // ── atlas load (the crawl rides in) ───────────────────────────
   const STUB = [
@@ -864,8 +886,26 @@
     });
 
   // ── tick ──────────────────────────────────────────────────────
-  function tick() {
-    requestAnimationFrame(tick);
+  // organic feedback: carry the last frame forward, zoomed and rotated a
+  // little, added back with 'lighter' — the phosphor loop that stacks the
+  // vector into a kaleidoscope. amount 0 = off (the scope stays faithful).
+  function applyFeedback() {
+    const amt = parseFloat(feedbackSlider.value) / 100;
+    if (amt <= 0) return;
+    const W = cssW(), H = cssH();
+    const zoom = 1 + 0.012 * amt;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = Math.min(0.92, amt);
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(0.0035 * amt);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-W / 2, -H / 2);
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, W, H);
+    ctx.restore();
+  }
+
+  function drawFrame() {
     if (mode === 'lissajous') { drawLissajous(); return; }
     if (mode === 'universe') { drawGraph(); return; }
     if (mode === 'nand') { drawNAND(); return; }
@@ -883,6 +923,12 @@
     }
     drawTrace(data);
     triggerVal.textContent = triggerSlider.value;
+  }
+
+  function tick() {
+    requestAnimationFrame(tick);
+    drawFrame();
+    applyFeedback();
   }
 
   // ── REC → HF (same contract as the OSC-9000 fork) ─────────────

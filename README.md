@@ -9,15 +9,17 @@
 > It lives in the same wavelength it creates: the line which mates —
 > written against property law — written by the fleet. 8b-is · 2026-09-18
 
-Live at [oscilloscope.vaked.dev](https://oscilloscope.vaked.dev/) · source
+Live at [oscilloscope.vaked.dev](https://oscilloscope.vaked.dev/) · a landing
+page at [`landing.html`](./landing.html) (hero + the modes + the lineage) served
+short at [lissaj.vaked.dev](https://lissaj.vaked.dev/) · source
 under 8b-is · renames the working title "crossmap" into the constellation
 (the crossed maps the lissajous weaves).
 
 ## the modes
 
 - **Mic / Output / Sine / Saw / Noise** — the faithful OSC-9000 scope, kept
-- **Lissajous** — ratio selector (1:1 · 2:3 · 3:4 · 5:8 · 8:13), 1..7 woven
-  traces, seeded phase drift
+- **Lissajous** — ratio selector (1:1 · 2:3 · 3:2 · 3:4 · 5:8 · 8:13 · 13:21 · 21:34 · 34:55),
+  1..7 woven traces, seeded phase drift
 - **Universe** — the atlas as a graph: vault · fleet · logic · cosmos rings
   on a seeded starfield, edges as lissajous chords, UltraGraph-parity
   centrality readouts (Freeman degree + closeness, mirroring 8b-is-engine's
@@ -26,6 +28,15 @@ under 8b-is · renames the working title "crossmap" into the constellation
   everything is NAND, the graph is its truth table
 - **Known Universe** — The AMNH film × Zimmer's Time (We Plants Are Happy
   Plants remix), the scope keeps weaving behind it
+
+## the feedback knob
+
+- **Feedback** — the organic loop over any mode: each frame is carried forward,
+  zoomed and rotated a little, and added back with `lighter`, so the vector
+  phosphor stacks into a kaleidoscope. It defaults to `0` — the faithful scope —
+  and the amount is the only control; the pure core is untouched.
+- deep-link the knobs for shots and the corridor:
+  `?mode=lissajous&feedback=70`.
 
 ## the data
 
@@ -66,6 +77,9 @@ HF stays dark (503, honest) until HF_TOKEN exists server-side.
 AMNH Hayden Planetarium (the Digital Universe Atlas lineage) · Uniview by
 SCISS (the sibling instrument) · The Known Universe (Visions of the Cosmos,
 Rubin Museum exhibit) · Nate (the diatribe shelf) · Wikipedia, crawled with
-robots.txt respect · the constellation, whose doctrine this page is.
+robots.txt respect · oscilloscope music, the genre the scope was built for:
+Jerobeam Fenderson, *Spirals* (Oscilloscope Music) and the rest of that album,
+where a stereo signal is the drawing · the constellation, whose doctrine this
+page is.
 
 SPDX-License-Identifier: AGPL-3.0-only
